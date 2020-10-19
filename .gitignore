@@ -107,6 +107,6 @@ venv.bak/
 .idea/
 
 # add
-/checkpoint
+/save
 *.out
 *.swp

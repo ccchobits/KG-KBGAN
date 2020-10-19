@@ -83,6 +83,9 @@ elif configs.model == "ComplEx":
     model = ComplEx(configs, n_ent, n_rel).to(device)
 else:
     raise NameError("Module (%s) not found..." % configs.model)
+if configs.debug:
+    print("Module (%s) has been built." % configs.model, flush=True)
+    print(model, flush=True)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
@@ -90,7 +93,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 total_loss = 0
 
 for epoch in range(1, epochs + 1):
-    if epoch % 10 == 0:
+    if epoch % 20 == 0:
         learning_rate /= lr_decay
         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     reader.shuffle()

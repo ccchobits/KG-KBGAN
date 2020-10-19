@@ -106,7 +106,7 @@ for epoch in range(1, epochs + 1):
         end = i + batch_size if i + batch_size <= n_train else n_train
         # pos_samples .type: np.array .shape: (batch_size, 3)
         pos_samples = reader.next_pos_batch(i, end)
-        neg_heads, neg_tails, neg_rels = corrupter.bern_corrupt_multi(pos_samples)
+        neg_heads, neg_tails, neg_rels = corrupter.bern_corrupt_multi(pos_samples, keep_truth=False)
         # neg_heads: .type: np.array .shape: (batch_size, 20) .loc: cuda
         neg_heads, neg_tails, neg_rels = torch.tensor(neg_heads).to(device), torch.tensor(neg_tails).to(device), \
             torch.tensor(neg_rels).to(device)
