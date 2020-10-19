@@ -44,6 +44,7 @@ parser.add_argument("--hidden", type=int, default=100, help="hidden layer")
 parser.add_argument("--neg_ratio", type=int, default=1, help="the ratio between the number of negative and positive samples")
 parser.add_argument("--reg", type=float, default=0., help="The coefficient for regularization")
 parser.add_argument("--n_neg_samples", type=int, default=1, help="The number of negtive samples")
+parser.add_argument("--dropout", type=float, default=0., help="the probabilty get zeroed")
 configs = parser.parse_args()
 
 dataset_name = configs.dataset
@@ -60,6 +61,7 @@ loss_function = configs.loss
 hidden = configs.hidden
 reg = configs.reg
 n_neg_samples = configs.n_neg_samples
+dropout = configs.dropout
 
 if configs.debug:
     print(
@@ -74,7 +76,8 @@ reader = Reader(configs)
 n_train = reader.n_train
 n_ent = reader.n_ent
 n_rel = reader.n_rel
-corrupter = Corrupter(configs)
+stat = reader.stat
+corrupter = Corrupter(configs, n_ent, stat)
 
 
 def load_model(model_name):
@@ -88,6 +91,10 @@ def load_model(model_name):
 
 gen = load_model("ComplEx").to(device)
 dis = load_model("TransE").to(device)
+if configs.debug:
+    print("Model TransE(dis) and ComplEx(gen) get loaded", flush=True)
+    print(gen, flush=True)
+    print(dis, flush=True)
 
 gen_optimizer = torch.optim.Adam(gen.parameters(), lr=learning_rate)
 dis_optimizer = torch.optim.Adam(dis.parameters(), lr=learning_rate)
@@ -95,7 +102,7 @@ dis_optimizer = torch.optim.Adam(dis.parameters(), lr=learning_rate)
 ### training the triplets in train_data
 avg_reward = 0
 for epoch in range(1, epochs + 1):
-    if epoch % 10 == 0:
+    if epoch % 20 == 0:
         learning_rate /= lr_decay
         gen_optimizer = torch.optim.Adam(gen.parameters(), lr=learning_rate)
         dis_optimizer = torch.optim.Adam(dis.parameters(), lr=learning_rate)
@@ -137,9 +144,6 @@ for epoch in range(1, epochs + 1):
         gen_optimizer.zero_grad()
         gen_loss.backward()
         gen_optimizer.step()
-
-        gen.constraint()
-        dis.constraint()
 
         epoch_d_loss += torch.sum(dis_loss)
     avg_loss = epoch_d_loss / n_train

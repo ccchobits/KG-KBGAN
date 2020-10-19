@@ -41,15 +41,16 @@ class ComplEx(nn.Module):
 
         score = torch.sum(rels_re * heads_re * tails_re, dim=-1) + torch.sum(rels_re * heads_im * tails_im, dim=-1) \
             + torch.sum(rels_im * heads_re * tails_im, dim=-1) - torch.sum(rels_im * heads_im * tails_re, dim=-1)
-        if clamp:
-            score = torch.clamp(score, -20, 20)
+        # if clamp:
+        #     score = torch.clamp(score, -20, 20)
         return score
 
+    # heads .type: torch.tensor .shape: (batch_size, n_samples) .loc: cuda
     def forward(self, heads, tails, rels):
         self.constraint()
 
         scores = self.get_score(heads, tails, rels)
-        probs = F.softmax(scores)
+        probs = F.softmax(scores, dim=-1)
         truth_probs = torch.log(probs[:, 0] + 1e-30)
 
         if self.reg == 0.:
