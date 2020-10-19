@@ -132,7 +132,9 @@ def rank(triplet):
     tails = torch.tensor(np.arange(n_ent)).to(device)
     rels = torch.tensor(np.tile(triplet[-1], n_ent)).to(device)
 
-    d = -model.get_score(heads, tails, rels, False)
+    d = model.get_score(heads, tails, rels, False)
+    if configs.model == "ComplEx":
+        d = -d
     sorted_d_indices = d.sort(descending=False).indices
     tail_raw_ranking = np.where(sorted_d_indices.cpu().numpy() == triplet[1])[0][0].tolist() + 1
     tail_filtered_ranking = tail_raw_ranking
@@ -147,7 +149,9 @@ def rank(triplet):
     tails = torch.tensor(np.tile(triplet[1], n_ent)).to(device)
     rels = torch.tensor(np.tile(triplet[-1], n_ent)).to(device)
 
-    d = -model.get_score(heads, tails, rels, False)
+    d = model.get_score(heads, tails, rels, False)
+    if configs.model == "ComplEx":
+        d = -d
     sorted_d_indices = d.sort(descending=False).indices
     head_raw_ranking = np.where(sorted_d_indices.cpu().numpy() == triplet[0])[0][0].tolist() + 1
     head_filtered_ranking = head_raw_ranking
