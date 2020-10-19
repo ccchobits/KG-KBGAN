@@ -43,6 +43,7 @@ parser.add_argument("--loss", type=str, default="margin", help="loss function")
 parser.add_argument("--hidden", type=int, default=100, help="hidden layer")
 parser.add_argument("--neg_ratio", type=int, default=1, help="the ratio between the number of negative and positive samples")
 parser.add_argument("--reg", type=float, default=0., help="The coefficient for regularization")
+parser.add_argument("--dropout", type=float, default=0., help="the probabilty get zeroed")
 configs = parser.parse_args()
 
 dataset_name = configs.dataset
@@ -58,6 +59,7 @@ gpu = configs.gpu
 loss_function = configs.loss
 hidden = configs.hidden
 reg = configs.reg
+dropout = configs.dropout
 
 if configs.debug:
     print(
