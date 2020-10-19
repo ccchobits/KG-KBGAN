@@ -15,4 +15,4 @@ class Saver:
             "configs": self.configs,
             "state_dict": model.state_dict()
         }
-        torch.save(content, os.path.join(self.path, filename))
+        torch.save(content, os.path.join("../", self.path, filename))
